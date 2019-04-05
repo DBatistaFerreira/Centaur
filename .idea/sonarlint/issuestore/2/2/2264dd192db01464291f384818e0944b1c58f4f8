@@ -1,0 +1,6 @@
+
+ƒsquid:S1319"mThe return type of this method should be an interface such as "Map" rather than the implementation "HashMap".(–ÛÖ9
+Qsquid:S1141."5Extract this nested try block into a separate method.(¡»¢üùÿÿÿÿ
+]squid:S2142"FEither re-interrupt this method or rethrow the "InterruptedException".(ä ¹€
+?squid:S1148 "#Use a logger to log this exception.(€ÉÔ…ýÿÿÿÿ
+?squid:S1148="#Use a logger to log this exception.(€ÉÔ…ýÿÿÿÿ

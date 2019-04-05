@@ -1,0 +1,14 @@
+
+nsquid:CommentedOutCodeLine"<This block of commented-out lines of code should be removed.(Ê¿¬Éýÿÿÿÿ8®ñžÙš-
+‹squid:S1319"mThe return type of this method should be an interface such as "Map" rather than the implementation "HashMap".(è½•¾8®ñžÙš-
+‚squid:S1488O"dImmediately return this expression instead of assigning it to the temporary variable "newLongitude".(¢¿·á8®ñžÙš-
+[squid:S1481"8Remove this unused "TOP_RIGHT_LONGITUDE" local variable.(í²ï¸øÿÿÿÿ8®ñžÙš-
+\squid:S1481"9Remove this unused "BOTTOM_LEFT_LATITUDE" local variable.(£·Û½ûÿÿÿÿ8®ñžÙš-
+]squid:S1481!":Remove this unused "BOTTOM_RIGHT_LATITUDE" local variable.(½Š«™ÿÿÿÿÿ8®ñžÙš-
+^squid:S1481"";Remove this unused "BOTTOM_RIGHT_LONGITUDE" local variable.(ìÏÖÿÿÿÿÿ8®ñžÙš-
+msquid:S1854""JRemove this useless assignment to local variable "BOTTOM_RIGHT_LONGITUDE".(ìÏÖÿÿÿÿÿ8®ñžÙš-
+lsquid:S1854!"IRemove this useless assignment to local variable "BOTTOM_RIGHT_LATITUDE".(½Š«™ÿÿÿÿÿ8®ñžÙš-
+ksquid:S1854"HRemove this useless assignment to local variable "BOTTOM_LEFT_LATITUDE".(£·Û½ûÿÿÿÿ8®ñžÙš-
+jsquid:S1854"GRemove this useless assignment to local variable "TOP_RIGHT_LONGITUDE".(í²ï¸øÿÿÿÿ8®ñžÙš-
+_squid:UselessImportCheck"4Remove this unused import 'java.util.stream.Stream'.(ó÷Ž”8®ñžÙš-
+Zsquid:UselessImportCheck"*Remove this unused import 'java.util.Set'.(ö²„¤þÿÿÿÿ8®ñžÙš-
