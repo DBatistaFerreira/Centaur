@@ -1,6 +1,8 @@
 import com.google.gson.annotations.SerializedName;
 
-public class Place {
+import java.io.Serializable;
+
+public class Place implements Serializable {
 
     @SerializedName("id")
     private String id;
@@ -17,7 +19,7 @@ public class Place {
     @SerializedName("geometry")
     private Location location;
 
-    private class Location {
+    private class Location implements Serializable {
         @SerializedName("location")
         private Coordinates coordinates;
 
@@ -29,14 +31,7 @@ public class Place {
             this.coordinates = coordinates;
         }
 
-        @Override
-        public String toString() {
-            return "Location{" +
-                    "coordinates=" + coordinates +
-                    '}';
-        }
-
-        private class Coordinates {
+        private class Coordinates implements Serializable  {
             @SerializedName("lat")
             private double latitude;
 
@@ -49,14 +44,6 @@ public class Place {
 
             public double getLongitude() {
                 return longitude;
-            }
-
-            @Override
-            public String toString() {
-                return "Coordinates{" +
-                        "latitude=" + latitude +
-                        ", longitude=" + longitude +
-                        '}';
             }
         }
     }
@@ -103,12 +90,6 @@ public class Place {
 
     @Override
     public String toString() {
-        return "Place{" +
-                "id='" + id + '\'' +
-                ", name='" + name + '\'' +
-                ", address='" + address + '\'' +
-                ", rating=" + rating +
-                ", location=" + location +
-                '}';
+        return "[" + name + ", " + address + ", (" + location.coordinates.getLatitude() + ", " + location.getCoordinates().getLongitude() + ")" + "]";
     }
 }

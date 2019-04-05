@@ -1,24 +1,27 @@
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Set;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
+import java.util.*;
 import java.util.stream.Stream;
 
 public class Application {
 
     private static final double EARTHS_RADIUS = 6378137;
-    private static final double RADIUS_OF_SEARCH_LATITUDE = 100; // meters
-    private static final double RADIUS_OF_SEARCH_LONGITUDE = 500; // meters
+    private static final double RADIUS_OF_SEARCH_LATITUDE = 500; // meters
+    private static final double RADIUS_OF_SEARCH_LONGITUDE = 250; // meters
     private static PlaceService placeService = new PlaceService();
 
-    public static void main(String[] args) {
+    private static FileOutputStream fos;
+    private static ObjectOutputStream oos;
+
+    public static void main(String[] args) throws IOException {
         //HashMap<String, Place> places = placeService.getPlacesFromCoordinates("45.485340","-73.621447");
 
         HashMap<String, Place> places = getAllWestmountRestaurants();
         places.values().stream().forEach(System.out::println);
         System.out.println("Amount of restaurants: " + places.size());
     }
-
 
     //Westmount has specifically Westmount and not montreal in their address
     public static HashMap<String, Place> getAllWestmountRestaurants(){
@@ -59,7 +62,7 @@ public class Application {
         Iterator it = places.entrySet().iterator();
         while(it.hasNext()){
             Map.Entry<String,Place> pair = (Map.Entry)it.next();
-            if(pair.getValue().getAddress().contains("Montréal") || pair.getValue().getAddress().contains("Montreal")){
+            if(!pair.getValue().getAddress().toLowerCase().contains("westmount")){
                 it.remove();
             }
         }
