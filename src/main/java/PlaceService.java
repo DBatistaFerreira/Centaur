@@ -5,11 +5,13 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Objects;
 import java.util.logging.Logger;
 
 public class PlaceService {
 
-    private static final String KEY = "AIzaSyAix_0G9PrbAOnjd1tRDo91RyPTLpYO7QI";
+//    private static final String KEY = "AIzaSyAix_0G9PrbAOnjd1tRDo91RyPTLpYO7QI"; //DANIELS KEY
+    private static final String KEY = "AIzaSyAVZ-GAyfLN3dlU6bgS_aCRYhPQJMljjR4";
 
     private static Logger logger = Logger.getLogger(PlaceService.class.getName());
 
@@ -40,6 +42,9 @@ public class PlaceService {
             String URL = "https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=" + latitude + "," + longitude +"&radius=1500&type=restaurant&key=" + KEY + extraParams;
             System.out.println(URL);
             String response = RESTConsumer.get(URL);
+            if(Objects.isNull(response)){
+                return null;
+            }
             JSONObject jsonObject = new JSONObject(response);
             JSONArray jsonArray = new JSONArray(jsonObject.getString("results"));
 
