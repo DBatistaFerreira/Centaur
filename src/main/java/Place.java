@@ -31,7 +31,7 @@ public class Place implements Serializable {
             this.coordinates = coordinates;
         }
 
-        public class Coordinates implements Serializable  {
+        public class Coordinates implements Serializable {
             @SerializedName("lat")
             private double latitude;
 

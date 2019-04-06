@@ -12,15 +12,16 @@ public class RESTConsumer {
     private static final int SUCCESS = 200;
     private static final String MIME_TYPE = "application/json";
 
-    private RESTConsumer(){}
+    private RESTConsumer() {
+    }
 
-    public static String get(String uri){
-        try{
+    public static String get(String uri) {
+        try {
             URL url = new URL(uri);
             HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection(); //Establish Connection to API
             httpURLConnection.setRequestMethod("GET");
             httpURLConnection.setRequestProperty("Accept", MIME_TYPE);
-            if(httpURLConnection.getResponseCode() != SUCCESS){
+            if (httpURLConnection.getResponseCode() != SUCCESS) {
                 logger.info("HTTP Failure: HTTP Error Code: " + httpURLConnection.getResponseCode());
                 return null;
             }
@@ -28,15 +29,14 @@ public class RESTConsumer {
             BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
             StringBuilder stringBuilder = new StringBuilder();
             String jsonLine;
-            while(!Objects.isNull((jsonLine = bufferedReader.readLine()))){ //Get Response JSON
+            while (!Objects.isNull((jsonLine = bufferedReader.readLine()))) { //Get Response JSON
                 stringBuilder.append(jsonLine);
             }
             httpURLConnection.disconnect();
             inputStreamReader.close();
             bufferedReader.close();
             return stringBuilder.toString();
-        }
-        catch(IOException e){
+        } catch (IOException e) {
             logger.info(e.getMessage());
             return null;
         }

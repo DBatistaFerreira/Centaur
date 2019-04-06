@@ -7,8 +7,8 @@ import java.util.stream.Stream;
 public class Application {
 
     private static final double EARTHS_RADIUS = 6378137.0;
-    private static final double RADIUS_OF_SEARCH_LATITUDE = 350.0; // meters Y
-    private static final double RADIUS_OF_SEARCH_LONGITUDE = 350.0; // meters X
+    private static final double RADIUS_OF_SEARCH_LATITUDE = 300.0; // meters Y
+    private static final double RADIUS_OF_SEARCH_LONGITUDE = 300.0; // meters X
     private static PlaceService placeService = new PlaceService();
 
     public static void main(String[] args) {
@@ -36,8 +36,7 @@ public class Application {
 //        HashMap<String, Place> places = getAllRestaurants( 45.459143, -73.757763,45.445739, -73.740739, "Region 3");
 
         //Region 5
-        HashMap<String, Place> places = getAllRestaurants( 45.505457, -73.579227,45.492868, -73.560976, "Region 3");
-
+        HashMap<String, Place> places = getAllRestaurants(45.505457, -73.579227, 45.492868, -73.560976, "Region 3");
 
 
         places.values().stream().forEach(System.out::println);
@@ -46,7 +45,7 @@ public class Application {
 
 
     //Westmount has specifically Westmount and not montreal in their address
-    public static HashMap<String, Place> getAllRestaurants(double topLeftLatitude, double topLeftLongitude, double bottomRightLatitude, double bottomRightLongitude, String city){
+    public static HashMap<String, Place> getAllRestaurants(double topLeftLatitude, double topLeftLongitude, double bottomRightLatitude, double bottomRightLongitude, String city) {
 
         final double TOP_LEFT_LATITUDE = topLeftLatitude;
         final double TOP_LEFT_LONGITUDE = topLeftLongitude;
@@ -56,13 +55,13 @@ public class Application {
         double currentLatitude = TOP_LEFT_LATITUDE;
         double currentLongitude = TOP_LEFT_LONGITUDE;
 
-        double nextLatitude =  currentLatitude;
+        double nextLatitude = currentLatitude;
         double nextLongitude = currentLongitude;
         //Get initial position restaurants
         HashMap<String, Place> places = placeService.getPlacesFromCoordinates(Double.toString(TOP_LEFT_LATITUDE), Double.toString(TOP_LEFT_LONGITUDE));
 
-        while(currentLatitude > BOTTOM_RIGHT_LATITUDE){
-            while(currentLongitude < BOTTOM_RIGHT_LONGITUDE){
+        while (currentLatitude > BOTTOM_RIGHT_LATITUDE) {
+            while (currentLongitude < BOTTOM_RIGHT_LONGITUDE) {
                 places.putAll(placeService.getPlacesFromCoordinates(Double.toString(currentLatitude), Double.toString(currentLongitude)));
                 nextLongitude = getLongitudeOffSet(currentLongitude, currentLatitude, RADIUS_OF_SEARCH_LONGITUDE);
                 currentLongitude = nextLongitude;
@@ -73,7 +72,7 @@ public class Application {
         }
 
         Iterator it = places.entrySet().iterator();
-        while(it.hasNext()) {
+        while (it.hasNext()) {
             Map.Entry<String, Place> pair = (Map.Entry) it.next();
 //            if (!pair.getValue().getAddress().contains("Montreal") || !pair.getValue().getAddress().contains("Montréal")) {
 //                it.remove();
@@ -96,14 +95,14 @@ public class Application {
 
     //https://gis.stackexchange.com/questions/2951/algorithm-for-offsetting-a-latitude-longitude-by-some-amount-of-meters
     //Source for the following formulas
-    private static double getLatitudeOffSet(double latitude, double radius){
-        double dlat = radius/EARTHS_RADIUS;
-        return latitude - (dlat * 180.0/Math.PI);
+    private static double getLatitudeOffSet(double latitude, double radius) {
+        double dlat = radius / EARTHS_RADIUS;
+        return latitude - (dlat * 180.0 / Math.PI);
     }
 
-    private static double getLongitudeOffSet(double longitude, double latitude, double radius){
-        double dlon = (radius/EARTHS_RADIUS) * (180.0/Math.PI / Math.cos((Math.PI * latitude)/180.0));
+    private static double getLongitudeOffSet(double longitude, double latitude, double radius) {
+        double dlon = (radius / EARTHS_RADIUS) * (180.0 / Math.PI / Math.cos((Math.PI * latitude) / 180.0));
         double newLongitude = longitude + dlon;
         return newLongitude;
-}
+    }
 }
