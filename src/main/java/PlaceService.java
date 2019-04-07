@@ -11,7 +11,8 @@ import java.util.logging.Logger;
 public class PlaceService {
 
     //    private static final String KEY = "AIzaSyAix_0G9PrbAOnjd1tRDo91RyPTLpYO7QI"; //DANIELS KEY
-    private static final String KEY = "AIzaSyAVZ-GAyfLN3dlU6bgS_aCRYhPQJMljjR4";
+    private static final String KEY = "AIzaSyC7UDMgeqDfCjxG66dB6wjWV2brejhDFAA";
+    public static final String SEARCH_RADIUS = "1000";
 
     private static Logger logger = Logger.getLogger(PlaceService.class.getName());
 
@@ -20,7 +21,7 @@ public class PlaceService {
     private HashMap<String, Place> places = new HashMap<>();
 
     public HashMap<String, Place> getPlacesFromCoordinates(String latitude, String longitude) {
-        logger.info("Starting scanning 1500meters from latitude: " + latitude + " , longitude: " + longitude);
+        logger.info("Starting scanning " + SEARCH_RADIUS + " meters from latitude: " + latitude + " , longitude: " + longitude);
         nextPageToken = "";
         putPlaces(latitude, longitude, "");
         String extraParams = "&pagetoken=" + nextPageToken;
@@ -33,13 +34,13 @@ public class PlaceService {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        logger.info("Finished scanning 1500meters from latitude: " + latitude + " , longitude: " + longitude);
+        logger.info("Finished scanning " + SEARCH_RADIUS + " meters from latitude: " + latitude + " , longitude: " + longitude);
         return places;
     }
 
     private HashMap<String, Place> putPlaces(String latitude, String longitude, String extraParams) {
         try {
-            String URL = "https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=" + latitude + "," + longitude + "&radius=1500&type=restaurant&key=" + KEY + extraParams;
+            String URL = "https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=" + latitude + "," + longitude + "&radius=" + SEARCH_RADIUS + "&type=restaurant&key=" + KEY + extraParams;
             System.out.println(URL);
             String response = RESTConsumer.get(URL);
             if (Objects.isNull(response)) {

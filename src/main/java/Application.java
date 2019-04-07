@@ -1,76 +1,85 @@
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Set;
+import java.io.*;
+import java.util.*;
 import java.util.stream.Stream;
 
 public class Application {
 
+    private static class Coordinate {
+        private double lat;
+        private double lng;
+
+        public Coordinate(double lat, double lng) {
+            this.lat = lat;
+            this.lng = lng;
+        }
+    }
+
     private static final double EARTHS_RADIUS = 6378137.0;
-    private static final double RADIUS_OF_SEARCH_LATITUDE = 300.0; // meters Y
-    private static final double RADIUS_OF_SEARCH_LONGITUDE = 300.0; // meters X
     private static PlaceService placeService = new PlaceService();
 
     public static void main(String[] args) {
-        //HashMap<String, Place> places = placeService.getPlacesFromCoordinates("45.485340","-73.621447");
 
-        //Scanning Westmount
-//        HashMap<String, Place> places = getAllRestaurants(45.495642, -73.618438, 45.473589, -73.580635, "Westmount");
+        ArrayList<Coordinate> points = new ArrayList<>();
+        try {
+            // Grabbing info from points.txt
+            BufferedReader br = new BufferedReader(new FileReader("points.txt"));
+            String line;
+            while ((line = br.readLine()) != null) {
+                String[] temp = line.split(", ");
+                points.add(new Coordinate(Double.parseDouble(temp[0]), Double.parseDouble(temp[1])));
+            }
+            br.close();
 
-        //Scanning Cote-st-luc
-//        HashMap<String, Place> places = getAllRestaurants(45.493075, -73.687729, 45.451900, -73.629805, "Côte Saint-Luc");
-
-        //Scanning Cote-st-luc
-//        HashMap<String, Place> places = getAllRestaurants(45.483375, -73.847156, 45.424986,  -73.778919, "Pointe-Claire");
-
-        //Region 1
-//        HashMap<String, Place> places = getAllRestaurants(  45.565493, -73.617141,45.546348, -73.586719, "Region 1");
-
-        //Region 2
-//        HashMap<String, Place> places = getAllRestaurants(  45.457518, -73.895904,45.448086, -73.876126, "Region 2");
-
-        //Region 3
-//        HashMap<String, Place> places = getAllRestaurants( 45.459143, -73.757763,45.445739, -73.740739, "Region 3");
-
-        //Region 4
-//        HashMap<String, Place> places = getAllRestaurants( 45.459143, -73.757763,45.445739, -73.740739, "Region 3");
-
-        //Region 5
-        HashMap<String, Place> places = getAllRestaurants(45.505457, -73.579227, 45.492868, -73.560976, "Region 3");
-
-
-        places.values().stream().forEach(System.out::println);
-        System.out.println("Amount of restaurants: " + places.size());
+            // Going through each area and fetching restaurants. Writing results in text files.
+            int i = 1;
+            int startingI = 27; //Set this to whatever point you wanna start at, otherwise leave it at 1.
+            for (Coordinate point : points) {
+                if (i >= startingI) {
+                    System.out.println("\n\nProcessing location " + i);
+                    BufferedWriter generalOut = new BufferedWriter(new FileWriter("data/summary.txt", true));
+                    BufferedWriter out = new BufferedWriter(new FileWriter("data/location_" + String.format("%03d", i) + ".txt"));
+                    HashMap<String, Place> places = getAllRestaurants(point.lat, point.lng);
+                    // Writing general info to summary file
+                    generalOut.write(i + "\t" + point.lat + "\t" + point.lng + "\t" + places.size());
+                    generalOut.newLine();
+                    for (Place place : places.values()) {
+                        out.write(place.toString());
+                        out.newLine();
+                    }
+                    // Close both to make sure nothing is lost is case of failure.
+                    out.close();
+                    generalOut.close();
+                }
+                i++;
+            }
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
+    private static HashMap<String, Place> getAllRestaurants(double lat, double lng) {
+        double searchRadius = 1000;
 
-    //Westmount has specifically Westmount and not montreal in their address
-    public static HashMap<String, Place> getAllRestaurants(double topLeftLatitude, double topLeftLongitude, double bottomRightLatitude, double bottomRightLongitude, String city) {
-
-        final double TOP_LEFT_LATITUDE = topLeftLatitude;
-        final double TOP_LEFT_LONGITUDE = topLeftLongitude;
-        final double BOTTOM_RIGHT_LATITUDE = bottomRightLatitude;
-        final double BOTTOM_RIGHT_LONGITUDE = bottomRightLongitude;
-
-        double currentLatitude = TOP_LEFT_LATITUDE;
-        double currentLongitude = TOP_LEFT_LONGITUDE;
-
-        double nextLatitude = currentLatitude;
-        double nextLongitude = currentLongitude;
-        //Get initial position restaurants
-        HashMap<String, Place> places = placeService.getPlacesFromCoordinates(Double.toString(TOP_LEFT_LATITUDE), Double.toString(TOP_LEFT_LONGITUDE));
-
-        while (currentLatitude > BOTTOM_RIGHT_LATITUDE) {
-            while (currentLongitude < BOTTOM_RIGHT_LONGITUDE) {
-                places.putAll(placeService.getPlacesFromCoordinates(Double.toString(currentLatitude), Double.toString(currentLongitude)));
-                nextLongitude = getLongitudeOffSet(currentLongitude, currentLatitude, RADIUS_OF_SEARCH_LONGITUDE);
-                currentLongitude = nextLongitude;
-            }
-            nextLatitude = getLatitudeOffSet(currentLatitude, RADIUS_OF_SEARCH_LATITUDE);
-            currentLatitude = nextLatitude;
-            currentLongitude = TOP_LEFT_LONGITUDE;
+        HashMap<String, Place> places = placeService.getPlacesFromCoordinates(Double.toString(lat), Double.toString(lng));
+        System.out.println("Initial restaurant count:" + places.size());
+        if (places.size() >= 60) {
+            System.out.println("Additional areas will be scanned");
+            double topLat = getLatitudeOffSet(lat, searchRadius / 2);
+            double bottomLat = getLatitudeOffSet(lat, -searchRadius / 2);
+            double leftLong = getLongitudeOffSet(lng, lat, -searchRadius / 2);
+            double rightLong = getLongitudeOffSet(lng, lat, searchRadius / 2);
+            places.putAll(placeService.getPlacesFromCoordinates(Double.toString(topLat), Double.toString(leftLong)));
+            places.putAll(placeService.getPlacesFromCoordinates(Double.toString(topLat), Double.toString(lng)));
+            places.putAll(placeService.getPlacesFromCoordinates(Double.toString(topLat), Double.toString(rightLong)));
+            places.putAll(placeService.getPlacesFromCoordinates(Double.toString(lat), Double.toString(leftLong)));
+            places.putAll(placeService.getPlacesFromCoordinates(Double.toString(lat), Double.toString(rightLong)));
+            places.putAll(placeService.getPlacesFromCoordinates(Double.toString(bottomLat), Double.toString(leftLong)));
+            places.putAll(placeService.getPlacesFromCoordinates(Double.toString(bottomLat), Double.toString(lng)));
+            places.putAll(placeService.getPlacesFromCoordinates(Double.toString(bottomLat), Double.toString(rightLong)));
+            System.out.println("Final results: " + places.size());
         }
-
         Iterator it = places.entrySet().iterator();
         while (it.hasNext()) {
             Map.Entry<String, Place> pair = (Map.Entry) it.next();
@@ -78,31 +87,39 @@ public class Application {
 //                it.remove();
 //            }
 
-            //remove this and fix names if you want the actual city ones
-            double lat = pair.getValue().getLocation().getCoordinates().getLatitude();
-            double lon = pair.getValue().getLocation().getCoordinates().getLongitude();
-            if ((lat > topLeftLatitude) || (lat < bottomRightLatitude) || (lon < topLeftLongitude) || (lon > bottomRightLongitude)) {
+            double lat2 = pair.getValue().getLocation().getCoordinates().getLatitude();
+            double lng2 = pair.getValue().getLocation().getCoordinates().getLongitude();
+            if (gpsDistance(lat, lng, lat2, lng2) > searchRadius) {
                 it.remove();
             }
         }
-        // To remove based on lat/long:
-        // lat needs to be greater than topleftlat
-        // or lat needs to be smaller than bottomrightlat
-        // or long needs to be smaller than topleftlong
-        // or long needs to be larger than bottomrightlong
+        System.out.println("Final filtered results: " + places.size());
         return places;
     }
 
-    //https://gis.stackexchange.com/questions/2951/algorithm-for-offsetting-a-latitude-longitude-by-some-amount-of-meters
-    //Source for the following formulas
-    private static double getLatitudeOffSet(double latitude, double radius) {
-        double dlat = radius / EARTHS_RADIUS;
-        return latitude - (dlat * 180.0 / Math.PI);
+    private static double gpsDistance(double lat1, double lng1, double lat2, double lng2) {
+        double dlat = Math.toRadians(lat2 - lat1);
+        double dlng = Math.toRadians(lng2 - lng1);
+        double a = Math.sin(dlat / 2) * Math.sin(dlat / 2) +
+                Math.cos(Math.toRadians(lat1)) * Math.cos(Math.toRadians(lat2)) *
+                        Math.sin(dlng / 2) * Math.sin(dlng / 2);
+        double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        double d = EARTHS_RADIUS * c;
+        //System.out.println("point 1: " + lat1 + ", " + lng1);
+        //System.out.println("point 2: " + lat2 + ", " + lng2);
+        //System.out.println("Distance: " + d);
+        return d;
     }
 
-    private static double getLongitudeOffSet(double longitude, double latitude, double radius) {
-        double dlon = (radius / EARTHS_RADIUS) * (180.0 / Math.PI / Math.cos((Math.PI * latitude) / 180.0));
+    private static double getLatitudeOffSet(double latitude, double offset) {
+        double dlat = offset / EARTHS_RADIUS;
+        return latitude + (dlat * 180.0 / Math.PI);
+    }
+
+    private static double getLongitudeOffSet(double longitude, double latitude, double offset) {
+        double dlon = (offset / EARTHS_RADIUS) * (180.0 / Math.PI / Math.cos((Math.PI * latitude) / 180.0));
         double newLongitude = longitude + dlon;
         return newLongitude;
     }
+
 }
