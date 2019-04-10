@@ -10,8 +10,7 @@ import java.util.logging.Logger;
 
 public class PlaceService {
 
-    //    private static final String KEY = "AIzaSyAix_0G9PrbAOnjd1tRDo91RyPTLpYO7QI"; //DANIELS KEY
-    private static final String KEY = "AIzaSyC7UDMgeqDfCjxG66dB6wjWV2brejhDFAA";
+    private static final String KEY = "your_api_key";
     public static final String SEARCH_RADIUS = "1000";
 
     private static Logger logger = Logger.getLogger(PlaceService.class.getName());

@@ -32,7 +32,7 @@ public class Application {
 
             // Going through each area and fetching restaurants. Writing results in text files.
             int i = 1;
-            int startingI = 27; //Set this to whatever point you wanna start at, otherwise leave it at 1.
+            int startingI = 1; //Set this to whatever point you wanna start at, otherwise leave it at 1.
             for (Coordinate point : points) {
                 if (i >= startingI) {
                     System.out.println("\n\nProcessing location " + i);
@@ -59,17 +59,18 @@ public class Application {
         }
     }
 
+    final static double regionRadius = 1000;
+
     private static HashMap<String, Place> getAllRestaurants(double lat, double lng) {
-        double searchRadius = 1000;
 
         HashMap<String, Place> places = placeService.getPlacesFromCoordinates(Double.toString(lat), Double.toString(lng));
         System.out.println("Initial restaurant count:" + places.size());
         if (places.size() >= 60) {
             System.out.println("Additional areas will be scanned");
-            double topLat = getLatitudeOffSet(lat, searchRadius / 2);
-            double bottomLat = getLatitudeOffSet(lat, -searchRadius / 2);
-            double leftLong = getLongitudeOffSet(lng, lat, -searchRadius / 2);
-            double rightLong = getLongitudeOffSet(lng, lat, searchRadius / 2);
+            double topLat = getLatitudeOffSet(lat, regionRadius / 2);
+            double bottomLat = getLatitudeOffSet(lat, -regionRadius / 2);
+            double leftLong = getLongitudeOffSet(lng, lat, -regionRadius / 2);
+            double rightLong = getLongitudeOffSet(lng, lat, regionRadius / 2);
             places.putAll(placeService.getPlacesFromCoordinates(Double.toString(topLat), Double.toString(leftLong)));
             places.putAll(placeService.getPlacesFromCoordinates(Double.toString(topLat), Double.toString(lng)));
             places.putAll(placeService.getPlacesFromCoordinates(Double.toString(topLat), Double.toString(rightLong)));
@@ -89,7 +90,7 @@ public class Application {
 
             double lat2 = pair.getValue().getLocation().getCoordinates().getLatitude();
             double lng2 = pair.getValue().getLocation().getCoordinates().getLongitude();
-            if (gpsDistance(lat, lng, lat2, lng2) > searchRadius) {
+            if (gpsDistance(lat, lng, lat2, lng2) > regionRadius) {
                 it.remove();
             }
         }
